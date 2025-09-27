@@ -451,7 +451,6 @@ td.clickable:hover, tr.clickable:hover {
     }
     
     .modal-overlay {
-        /* PERBAIKAN: Mengubah posisi modal ke atas layar di HP */
         align-items: flex-start;
         padding: 1rem 0;
     }
@@ -488,9 +487,10 @@ td.clickable:hover, tr.clickable:hover {
         display: none;
     }
     
-    /* Menyesuaikan kolom Total di tfoot */
-    #container-tabel-bongkaran tfoot td:nth-child(2), /* Kolom Omzet */
-    #container-tabel-bongkaran tfoot td:nth-child(6) { /* Kolom Bonus */
+    /* PERBAIKAN: Hapus baris di bawah ini agar total di footer tidak hilang */
+    /* #container-tabel-bongkaran tfoot td:nth-child(2),
+    #container-tabel-bongkaran tfoot td:nth-child(6) {
         display: none;
     }
+    */
 }
