@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Angkut</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="halaman-daftar-perusahaan" class="page">
+        <h1>GAS <span class="highlight-text">ANGKUT</span></h1>
+        <p class="subtitle">by RK</p>
+        <h3>DAFTAR PERUSAHAAN</h3>
+        <div id="container-daftar-perusahaan"></div>
+        <button id="tombol-tambah-perusahaan-baru" class="tombol-utama">+ TAMBAH PERUSAHAAN BARU</button>
+    </div>
+
+    <div id="halaman-menu" class="page hidden">
+        <button class="tombol-kembali" id="kembali-ke-daftar-perusahaan">&larr; Kembali ke Daftar Perusahaan</button>
+        <h2 id="display-nama-perusahaan-menu"></h2>
+        <h3>MENU UTAMA</h3>
+        <div class="menu-container">
+            <button id="menu-catatan-bongkaran" class="menu-button">Catatan Bongkaran</button>
+            <button id="menu-statistik-sopir" class="menu-button">Statistik Sopir</button>
+            <button id="menu-statistik-lokasi" class="menu-button">Statistik Lokasi</button>
+            <button id="menu-statistik-kendaraan" class="menu-button">Statistik Kendaraan</button>
+        </div>
+    </div>
+
+    <div id="halaman-bongkaran" class="page hidden">
+        <button class="tombol-kembali" id="kembali-ke-menu-dari-bongkaran">&larr; Kembali ke Menu</button>
+        <h2 id="display-nama-perusahaan-bongkaran"></h2>
+        <h3>CATATAN BONGKARAN</h3>
+        <div class="filter-container">
+            <label for="filter-bulan-bongkaran">Tampilkan Bulan:</label>
+            <select id="filter-bulan-bongkaran"></select>
+        </div>
+        <button id="tombol-tambah-bongkaran-baru" class="tombol-utama">+ Tambah Catatan Baru</button>
+        <div id="container-tabel-bongkaran"></div>
+    </div>
+
+    <div id="halaman-ringkasan-stats" class="page hidden">
+        <button class="tombol-kembali" id="kembali-ke-menu-dari-ringkasan">&larr; Kembali ke Menu</button>
+        <h2 id="ringkasan-stats-judul"></h2>
+        <h3>RINGKASAN</h3>
+        <div class="filter-container">
+            <label for="filter-bulan-ringkasan">Tampilkan Bulan:</label>
+            <select id="filter-bulan-ringkasan"></select>
+        </div>
+        <div id="container-ringkasan-stats"></div>
+    </div>
+
+    <div id="halaman-statistik" class="page hidden">
+        <button class="tombol-kembali" id="kembali-dari-statistik">&larr; Kembali</button>
+        <h2 id="statistik-judul"></h2>
+        <h3>RINGKASAN STATISTIK</h3>
+        <div id="statistik-ringkasan-container"></div>
+        <h3>DETAIL RIWAYAT</h3>
+        <div id="statistik-tabel-detail"></div>
+    </div>
+
+
+    <div id="modal-bongkaran" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-judul">Tambah Catatan Baru</h3>
+            <form id="form-bongkaran">
+                <input type="hidden" id="edit-id-bongkaran">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="input-tanggal">Tanggal</label>
+                        <input id="input-tanggal" type="date" required>
+                    </div>
+                    <div class="form-group autocomplete-wrapper">
+                        <label for="input-plat">Plat Mobil</label>
+                        <input id="input-plat" type="text" placeholder="Contoh: B 1234 ABC" required autocomplete="off">
+                        <div class="autocomplete-suggestions" id="suggestions-plat"></div>
+                    </div>
+                    <div class="form-group autocomplete-wrapper">
+                        <label for="input-nota">No. Nota</label>
+                        <input id="input-nota" type="text" placeholder="Nomor nota" required autocomplete="off">
+                        <div class="autocomplete-suggestions" id="suggestions-nota"></div>
+                    </div>
+                    <div class="form-group autocomplete-wrapper">
+                        <label for="input-sopir">Sopir</label>
+                        <input id="input-sopir" type="text" placeholder="Nama sopir" required autocomplete="off">
+                        <div class="autocomplete-suggestions" id="suggestions-sopir"></div>
+                    </div>
+                    <div class="form-group autocomplete-wrapper">
+                        <label for="input-material">Material</label>
+                        <input id="input-material" type="text" placeholder="Contoh: Pasir, Batu" required autocomplete="off">
+                        <div class="autocomplete-suggestions" id="suggestions-material"></div>
+                    </div>
+                    <div class="form-group autocomplete-wrapper">
+                        <label for="input-lokasi">Lokasi Bongkaran</label>
+                        <input id="input-lokasi" type="text" placeholder="Nama lokasi" required autocomplete="off">
+                        <div class="autocomplete-suggestions" id="suggestions-lokasi"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-harga">Harga per Unit Volume</label>
+                        <input id="input-harga" type="text" inputmode="decimal" placeholder="Harga" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-volume">Volume</label>
+                        <input id="input-volume" type="text" inputmode="decimal" placeholder="Contoh: 8,5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-perongkosan">Perongkosan</label>
+                        <input id="input-perongkosan" type="text" inputmode="decimal" placeholder="Total biaya" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-gaji">Gaji Sopir</label>
+                        <input id="input-gaji" type="text" inputmode="decimal" placeholder="Gaji pokok sopir" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-bonus">Bonus</label>
+                        <input id="input-bonus" type="text" inputmode="decimal" placeholder="Jumlah bonus">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" id="tombol-simpan-bongkaran" class="tombol-utama">Simpan</button>
+                    <button type="button" id="tombol-batal-modal" class="tombol-sekunder">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

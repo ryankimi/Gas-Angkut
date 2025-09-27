@@ -1,0 +1,454 @@
+/* =====================================================================
+   GLOBAL STYLES & VARIABLES
+   ===================================================================== */
+:root {
+    --primary-color: #3c6d55;
+    --primary-hover: #315946;
+    --dark-color: #000000;
+    --light-color: #FFFFFF;
+    --border-color: #EAEAEA;
+    --text-color: #000000;
+    --text-muted: #6c757d;
+    --danger-color: #dc3545;
+    --font-family: 'Poppins', sans-serif;
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --border-radius: 8px;
+}
+
+body {
+    font-family: var(--font-family);
+    text-align: center;
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    margin: 0;
+    padding: 1rem;
+}
+
+.page { 
+    max-width: 1200px;
+    margin: auto; 
+    background-color: var(--light-color); 
+    padding: 2rem 1.5rem; 
+    box-shadow: var(--shadow-md);
+    border-radius: var(--border-radius);
+    position: relative;
+}
+.hidden { display: none !important; }
+
+h1, h2, h3, h4 {
+    color: var(--dark-color);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+h1 { 
+    margin-bottom: 0.25rem; 
+    font-size: 2.2rem;
+    letter-spacing: 1.5px;
+}
+h2 { 
+    margin-top: 0; 
+    border-bottom: 2px solid var(--border-color); 
+    padding-bottom: 1rem; 
+    margin-bottom: 1.5rem; 
+}
+h3 { 
+    font-size: 1rem; 
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
+
+.subtitle {
+    margin-top: 0;
+    margin-bottom: 3rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.highlight-text {
+    color: var(--primary-color);
+}
+
+/* =====================================================================
+   BUTTONS & INPUTS
+   ===================================================================== */
+button {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-family: var(--font-family);
+}
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.tombol-utama { 
+    background-color: var(--primary-color); 
+    color: var(--light-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 1rem 0;
+}
+.tombol-utama:hover {
+    background-color: var(--primary-hover);
+}
+
+.tombol-sekunder {
+    background-color: #6c757d;
+    color: var(--light-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 14px 28px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+.tombol-sekunder:hover {
+    background-color: #5a6268;
+}
+
+.tombol-kembali { 
+    all: unset;
+    cursor: pointer; 
+    position: absolute; 
+    top: 20px; 
+    left: 20px; 
+    font-weight: 600; 
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+.tombol-kembali:hover {
+    color: var(--primary-color);
+}
+
+#halaman-menu h2, #halaman-bongkaran h2, #halaman-statistik h2, #halaman-ringkasan-stats h2 {
+    margin-top: 3.5rem;
+}
+
+/* =====================================================================
+   MAIN MENU
+   ===================================================================== */
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+.menu-button {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    border: none;
+    padding: 2.5rem 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--border-radius);
+}
+.menu-button:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+
+/* =====================================================================
+   COMPANY LIST
+   ===================================================================== */
+#container-daftar-perusahaan {
+    margin: 2rem 0;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.perusahaan-item-container {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease-in-out;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+}
+.perusahaan-item-container:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.nama-perusahaan-item {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--light-color);
+}
+
+.tombol-pengaturan-perusahaan {
+    background-color: transparent;
+    color: var(--light-color);
+    font-size: 1.5rem;
+    padding: 5px;
+    margin: 0;
+    border: none;
+    line-height: 1;
+}
+.tombol-pengaturan-perusahaan:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: none;
+}
+
+.menu-aksi-perusahaan {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 15px;
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    z-index: 20;
+    width: 180px;
+    padding: 0.5rem 0;
+}
+.menu-aksi-perusahaan a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--dark-color);
+    text-decoration: none;
+    text-align: left;
+}
+.menu-aksi-perusahaan a:hover {
+    background-color: #f0f0f0;
+}
+.menu-aksi-hapus {
+    color: var(--danger-color) !important;
+}
+
+/* =====================================================================
+   FILTERS & TABLES
+   ===================================================================== */
+.filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+}
+.filter-container label {
+    font-weight: 600;
+}
+.filter-container select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-family: var(--font-family);
+    min-width: 200px;
+}
+
+
+#container-tabel-bongkaran, #statistik-tabel-detail, #container-ringkasan-stats {
+    margin-top: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--light-color);
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 1200px;
+}
+th, td { 
+    padding: 12px 15px; 
+    border-bottom: 1px solid var(--border-color); 
+    text-align: left; 
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+th { 
+    background-color: #f8f9fa; 
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-color);
+}
+tbody tr:hover { background-color: #f0f0f0; }
+
+tfoot tr {
+    background-color: #f8f9fa;
+    font-weight: 700;
+}
+tfoot td {
+    border-top: 2px solid #dee2e6;
+}
+
+.col-actions button {
+    all: unset;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+.col-actions button:hover {
+    color: var(--primary-color);
+}
+.col-actions .tombol-hapus-bongkaran:hover {
+    color: var(--danger-color);
+}
+td.clickable, tr.clickable {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+td.clickable:hover, tr.clickable:hover {
+    text-decoration: underline;
+}
+
+/* STATS SUMMARY CARDS */
+#statistik-ringkasan-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.stat-card {
+    background-color: #f8f9fa;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+}
+.stat-card .stat-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 0.5rem 0;
+}
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+/* =====================================================================
+   MODAL & AUTOCOMPLETE
+   ===================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 2rem 0;
+}
+.modal-content {
+    background-color: var(--light-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    width: 90%;
+    max-width: 800px;
+    text-align: left;
+}
+
+#form-bongkaran .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(60, 109, 85, 0.2);
+}
+
+.modal-actions {
+    text-align: right;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+.modal-actions button {
+    margin-left: 1rem;
+}
+
+/* AUTOCOMPLETE */
+.autocomplete-wrapper {
+    position: relative;
+}
+.autocomplete-suggestions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--light-color);
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1001;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+.autocomplete-suggestions div {
+    padding: 10px;
+    cursor: pointer;
+}
+.autocomplete-suggestions div:hover {
+    background-color: #f0f0f0;
+}
+
+
+@media (max-width: 768px) {
+    #form-bongkaran .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .modal-content {
+        padding: 1.5rem;
+    }
+    h1 { font-size: 1.8rem; }
+}
