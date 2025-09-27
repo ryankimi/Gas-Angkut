@@ -450,6 +450,12 @@ td.clickable:hover, tr.clickable:hover {
         padding: 1.5rem 1rem;
     }
     
+    .modal-overlay {
+        /* PERBAIKAN: Mengubah posisi modal ke atas layar di HP */
+        align-items: flex-start;
+        padding: 1rem 0;
+    }
+
     #form-bongkaran .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -483,11 +489,8 @@ td.clickable:hover, tr.clickable:hover {
     }
     
     /* Menyesuaikan kolom Total di tfoot */
-    #container-tabel-bongkaran tfoot td:nth-child(1) {
-        text-align: center;
-    }
-    #container-tabel-bongkaran tfoot td:nth-child(2), /* Omzet */
-    #container-tabel-bongkaran tfoot td:nth-child(6) { /* Bonus */
+    #container-tabel-bongkaran tfoot td:nth-child(2), /* Kolom Omzet */
+    #container-tabel-bongkaran tfoot td:nth-child(6) { /* Kolom Bonus */
         display: none;
     }
 }
