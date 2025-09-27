@@ -478,19 +478,8 @@ td.clickable:hover, tr.clickable:hover {
     }
 
     /* Sembunyikan kolom yang kurang penting di tabel utama */
-    #container-tabel-bongkaran th:nth-child(3),
-    #container-tabel-bongkaran td:nth-child(3), /* No. Nota */
-    #container-tabel-bongkaran th:nth-child(8),
-    #container-tabel-bongkaran td:nth-child(8), /* Omzet */
-    #container-tabel-bongkaran th:nth-child(12),
-    #container-tabel-bongkaran td:nth-child(12) { /* Bonus */
+    .col-nota,
+    .col-bonus {
         display: none;
     }
-    
-    /* PERBAIKAN: Hapus baris di bawah ini agar total di footer tidak hilang */
-    /* #container-tabel-bongkaran tfoot td:nth-child(2),
-    #container-tabel-bongkaran tfoot td:nth-child(6) {
-        display: none;
-    }
-    */
 }
