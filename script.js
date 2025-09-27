@@ -125,11 +125,9 @@ function getActiveCompany() {
     return truckingAppData.find(c => c.id === activeCompanyId);
 }
 
-// Diperbarui: untuk menangani data lama yang format hurufnya berbeda
 function getUniqueValues(fieldName) {
     const company = getActiveCompany();
     if (!company) return [];
-    // Ubah semua jadi huruf kecil dulu, baru cari yang unik
     const values = company.unloadingJobs.map(job => (job[fieldName] || '').toLowerCase());
     return [...new Set(values)].filter(Boolean);
 }
@@ -141,7 +139,7 @@ function populateMonthFilter(selectElement, jobs, callback) {
     
     selectElement.innerHTML = '<option value="semua">Semua Bulan</option>';
     months.forEach(month => {
-        const date = new Date(month + "-02"); // Pakai tanggal 2 untuk hindari bug timezone
+        const date = new Date(month + "-02");
         const monthName = date.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
         const option = document.createElement('option');
         option.value = month;
@@ -162,12 +160,10 @@ function formatTampilan(str) {
 // EVENT LISTENERS UTAMA
 // =====================================================================
 function setupEventListeners() {
-    // Navigasi
     kembaliKeDaftarPerusahaan.addEventListener('click', () => tampilkanHalaman('halaman-daftar-perusahaan'));
     kembaliKeMenuDariBongkaran.addEventListener('click', () => tampilkanHalaman('halaman-menu'));
     kembaliKeMenuDariRingkasan.addEventListener('click', () => tampilkanHalaman('halaman-menu'));
 
-    // Menu Utama
     menuCatatanBongkaran.addEventListener('click', () => {
         const company = getActiveCompany();
         displayNamaPerusahaanBongkaran.textContent = company.name;
@@ -325,9 +321,11 @@ function renderUnloadingTable() {
 
     const sortedJobs = [...filteredJobs].sort((a, b) => {
         let valA, valB;
-        if (sortColumn === 'penghasilan') {
-            valA = (a.harga * a.volume) - a.perongkosan - a.gaji - (a.bonus || 0);
-            valB = (b.harga * b.volume) - b.perongkosan - b.gaji - (b.bonus || 0);
+        if (sortColumn === 'penghasilan' || sortColumn === 'omzet') {
+            const calcA = (a.harga * a.volume);
+            const calcB = (b.harga * b.volume);
+            valA = sortColumn === 'omzet' ? calcA : calcA - a.perongkosan - a.gaji - (a.bonus || 0);
+            valB = sortColumn === 'omzet' ? calcB : calcB - b.perongkosan - b.gaji - (b.bonus || 0);
         } else {
             valA = a[sortColumn];
             valB = b[sortColumn];
@@ -348,20 +346,16 @@ function renderUnloadingTable() {
         { key: 'nota', label: 'No. Nota' }, { key: 'sopir', label: 'Sopir' },
         { key: 'material', label: 'Material' }, { key: 'volume', label: 'Volume' },
         { key: 'harga', label: 'Harga' }, { key: 'omzet', label: 'Omzet' },
-        { key: 'lokasi', label: 'Lokasi' }, // << DIKEMBALIKAN
-        { key: 'perongkosan', label: 'Perongkosan' }, { key: 'gaji', label: 'Gaji' },
-        { key: 'bonus', label: 'Bonus' }, { key: 'penghasilan', label: 'Penghasilan' },
-        { key: null, label: 'Aksi' }
+        { key: 'lokasi', label: 'Lokasi' }, { key: 'perongkosan', label: 'Perongkosan' },
+        { key: 'gaji', label: 'Gaji' }, { key: 'bonus', label: 'Bonus' },
+        { key: 'penghasilan', label: 'Penghasilan' }, { key: 'aksi', label: 'Aksi' }
     ];
 
     let headerHTML = '<tr>';
     headers.forEach(header => {
-        if (header.key) {
-            const sortIndicator = sortColumn === header.key ? (sortDirection === 'asc' ? ' &#9650;' : ' &#9660;') : '';
-            headerHTML += `<th onclick="sortTableBy('${header.key}')" style="cursor: pointer;">${header.label}${sortIndicator}</th>`;
-        } else {
-            headerHTML += `<th>${header.label}</th>`;
-        }
+        const sortIndicator = sortColumn === header.key ? (sortDirection === 'asc' ? ' &#9650;' : ' &#9660;') : '';
+        const clickable = header.key !== 'aksi' ? `onclick="sortTableBy('${header.key}')" style="cursor: pointer;"` : '';
+        headerHTML += `<th class="col-${header.key}" ${clickable}>${header.label}${sortIndicator}</th>`;
     });
     headerHTML += '</tr>';
 
@@ -374,20 +368,20 @@ function renderUnloadingTable() {
         });
         bodyHTML += `
             <tr id="job-${job.id}">
-                <td>${displayDate}</td>
-                <td class="clickable" onclick="tampilkanStatistik('plat', '${job.plat}', 'halaman-bongkaran')">${job.plat.toUpperCase()}</td>
-                <td>${job.nota}</td>
-                <td class="clickable" onclick="tampilkanStatistik('sopir', '${job.sopir}', 'halaman-bongkaran')">${formatTampilan(job.sopir)}</td>
-                <td>${formatTampilan(job.material)}</td>
-                <td>${job.volume.toLocaleString('id-ID')}</td>
-                <td>${job.harga.toLocaleString('id-ID')}</td>
-                <td>${omzet.toLocaleString('id-ID')}</td>
-                <td class="clickable" onclick="tampilkanStatistik('lokasi', '${job.lokasi}', 'halaman-bongkaran')">${formatTampilan(job.lokasi)}</td>
-                <td>${job.perongkosan.toLocaleString('id-ID')}</td>
-                <td>${job.gaji.toLocaleString('id-ID')}</td>
-                <td>${(job.bonus || 0).toLocaleString('id-ID')}</td>
-                <td><strong>${income.toLocaleString('id-ID')}</strong></td>
-                <td class="col-actions">
+                <td class="col-tanggal">${displayDate}</td>
+                <td class="col-plat clickable" onclick="tampilkanStatistik('plat', '${job.plat}', 'halaman-bongkaran')">${job.plat.toUpperCase()}</td>
+                <td class="col-nota">${job.nota}</td>
+                <td class="col-sopir clickable" onclick="tampilkanStatistik('sopir', '${job.sopir}', 'halaman-bongkaran')">${formatTampilan(job.sopir)}</td>
+                <td class="col-material">${formatTampilan(job.material)}</td>
+                <td class="col-volume">${job.volume.toLocaleString('id-ID')}</td>
+                <td class="col-harga">${job.harga.toLocaleString('id-ID')}</td>
+                <td class="col-omzet">${omzet.toLocaleString('id-ID')}</td>
+                <td class="col-lokasi clickable" onclick="tampilkanStatistik('lokasi', '${job.lokasi}', 'halaman-bongkaran')">${formatTampilan(job.lokasi)}</td>
+                <td class="col-perongkosan">${job.perongkosan.toLocaleString('id-ID')}</td>
+                <td class="col-gaji">${job.gaji.toLocaleString('id-ID')}</td>
+                <td class="col-bonus">${(job.bonus || 0).toLocaleString('id-ID')}</td>
+                <td class="col-penghasilan"><strong>${income.toLocaleString('id-ID')}</strong></td>
+                <td class="col-aksi col-actions">
                     <button onclick="editBongkaran(${job.id})">&#9998;</button>
                     <button class="tombol-hapus-bongkaran" onclick="hapusBongkaran(${job.id})">&times;</button>
                 </td>
@@ -405,18 +399,21 @@ function renderUnloadingTable() {
         return acc;
     }, { omzet: 0, perongkosan: 0, gaji: 0, bonus: 0, penghasilan: 0 });
 
-    const footerHTML = `
-        <tr>
-            <td colspan="7"><strong>TOTAL</strong></td>
-            <td><strong>${totals.omzet.toLocaleString('id-ID')}</strong></td>
-            <td></td>
-            <td><strong>${totals.perongkosan.toLocaleString('id-ID')}</strong></td>
-            <td><strong>${totals.gaji.toLocaleString('id-ID')}</strong></td>
-            <td><strong>${totals.bonus.toLocaleString('id-ID')}</strong></td>
-            <td><strong>${totals.penghasilan.toLocaleString('id-ID')}</strong></td>
-            <td></td>
-        </tr>
-    `;
+    let footerHTML = '<tr>';
+    const footerCells = {
+        'tanggal': '<strong>TOTAL</strong>',
+        'omzet': `<strong>${totals.omzet.toLocaleString('id-ID')}</strong>`,
+        'perongkosan': `<strong>${totals.perongkosan.toLocaleString('id-ID')}</strong>`,
+        'gaji': `<strong>${totals.gaji.toLocaleString('id-ID')}</strong>`,
+        'bonus': `<strong>${totals.bonus.toLocaleString('id-ID')}</strong>`,
+        'penghasilan': `<strong>${totals.penghasilan.toLocaleString('id-ID')}</strong>`
+    };
+    headers.forEach(header => {
+        const content = footerCells[header.key] || '';
+        footerHTML += `<td class="col-${header.key}">${content}</td>`;
+    });
+    footerHTML += '</tr>';
+
 
     containerTabelBongkaran.innerHTML = `<table><thead>${headerHTML}</thead><tbody>${bodyHTML}</tbody><tfoot>${footerHTML}</tfoot></table>`;
 }
@@ -430,17 +427,17 @@ function setupAutocomplete(inputId, suggestionsId, fieldName) {
     
     input.addEventListener('focus', () => {
         const allSuggestions = getUniqueValues(fieldName);
-        showSuggestions(allSuggestions, '');
+        showSuggestions(allSuggestions);
     });
     
     input.addEventListener('input', () => {
         const allSuggestions = getUniqueValues(fieldName);
         const query = input.value.toLowerCase();
         const filtered = allSuggestions.filter(item => String(item).toLowerCase().includes(query));
-        showSuggestions(filtered, query);
+        showSuggestions(filtered);
     });
 
-    const showSuggestions = (suggestions, query) => {
+    const showSuggestions = (suggestions) => {
         suggestionsContainer.innerHTML = '';
         if (suggestions.length > 0) {
             suggestions.forEach(suggestion => {
@@ -588,7 +585,7 @@ function tampilkanRingkasanStats(kategori) {
 
     const summary = {};
     filteredJobs.forEach(job => {
-        const key = (job[kategori] || '').toLowerCase(); // << DIUBAH: Gunakan lowercase key untuk grouping
+        const key = (job[kategori] || '').toLowerCase();
         if (!key) return;
         if (!summary[key]) {
             summary[key] = { totalRit: 0, totalVolume: 0, totalPenghasilan: 0 };
@@ -631,7 +628,6 @@ function tampilkanRingkasanStats(kategori) {
 
 function tampilkanStatistik(kategori, nilai, halamanKembali) {
     const company = getActiveCompany();
-    // DIUBAH: Filter berdasarkan lowercase
     const filteredJobs = company.unloadingJobs.filter(job => (job[kategori] || '').toLowerCase() === nilai);
     filteredJobs.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
@@ -683,12 +679,12 @@ function tampilkanStatistik(kategori, nilai, halamanKembali) {
         detailHTML += `
             <tr>
                 <td>${displayDate}</td>
-                ${kategori !== 'plat' ? `<td>${job.plat.toUpperCase()}</td>` : ''}
-                ${kategori !== 'sopir' ? `<td>${formatTampilan(job.sopir)}</td>` : ''}
-                ${kategori !== 'lokasi' ? `<td>${formatTampilan(job.lokasi)}</td>` : ''}
-                <td>${formatTampilan(job.material)}</td>
-                <td>${job.volume.toLocaleString('id-ID')}</td>
-                <td><strong>${income.toLocaleString('id-ID')}</strong></td>
+                ${kategori !== 'plat' ? `<td class="col-plat">${job.plat.toUpperCase()}</td>` : ''}
+                ${kategori !== 'sopir' ? `<td class="col-sopir">${formatTampilan(job.sopir)}</td>` : ''}
+                ${kategori !== 'lokasi' ? `<td class="col-lokasi">${formatTampilan(job.lokasi)}</td>` : ''}
+                <td class="col-material">${formatTampilan(job.material)}</td>
+                <td class="col-volume">${job.volume.toLocaleString('id-ID')}</td>
+                <td class="col-penghasilan"><strong>${income.toLocaleString('id-ID')}</strong></td>
             </tr>
         `;
     });
