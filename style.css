@@ -442,7 +442,14 @@ td.clickable:hover, tr.clickable:hover {
 }
 
 
+/* =====================================================================
+   RESPONSIVE & MOBILE ADJUSTMENTS
+   ===================================================================== */
 @media (max-width: 768px) {
+    .page {
+        padding: 1.5rem 1rem;
+    }
+    
     #form-bongkaran .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -451,4 +458,36 @@ td.clickable:hover, tr.clickable:hover {
         padding: 1.5rem;
     }
     h1 { font-size: 1.8rem; }
+    .filter-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    /* Merampingkan semua tabel */
+    table {
+        min-width: 0;
+    }
+    th, td {
+        padding: 10px 5px;
+        font-size: 0.8rem;
+    }
+
+    /* Sembunyikan kolom yang kurang penting di tabel utama */
+    #container-tabel-bongkaran th:nth-child(3),
+    #container-tabel-bongkaran td:nth-child(3), /* No. Nota */
+    #container-tabel-bongkaran th:nth-child(8),
+    #container-tabel-bongkaran td:nth-child(8), /* Omzet */
+    #container-tabel-bongkaran th:nth-child(12),
+    #container-tabel-bongkaran td:nth-child(12) { /* Bonus */
+        display: none;
+    }
+    
+    /* Menyesuaikan kolom Total di tfoot */
+    #container-tabel-bongkaran tfoot td:nth-child(1) {
+        text-align: center;
+    }
+    #container-tabel-bongkaran tfoot td:nth-child(2), /* Omzet */
+    #container-tabel-bongkaran tfoot td:nth-child(6) { /* Bonus */
+        display: none;
+    }
 }
