@@ -320,7 +320,7 @@ td.clickable:hover, tr.clickable:hover {
 /* STATS SUMMARY CARDS */
 #statistik-ringkasan-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
 }
@@ -332,14 +332,14 @@ td.clickable:hover, tr.clickable:hover {
     text-align: center;
 }
 .stat-card .stat-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-muted);
     margin: 0 0 0.5rem 0;
 }
 .stat-card .stat-value {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary-color);
     margin: 0;
@@ -478,8 +478,7 @@ td.clickable:hover, tr.clickable:hover {
     }
 
     /* Sembunyikan kolom yang kurang penting di tabel utama */
-    .col-nota,
-    .col-bonus {
+    .col-nota {
         display: none;
     }
 }
