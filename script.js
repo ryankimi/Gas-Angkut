@@ -588,37 +588,39 @@ function tampilkanRingkasanStats(kategori) {
         const key = (job[kategori] || '').toLowerCase();
         if (!key) return;
         if (!summary[key]) {
-            summary[key] = { totalRit: 0, totalVolume: 0, totalPenghasilan: 0 };
+            summary[key] = { totalRit: 0, totalVolume: 0, totalPenghasilan: 0, totalOmzet: 0, totalPerongkosan: 0, totalGaji: 0, totalBonus: 0 };
         }
+        const omzet = job.harga * job.volume;
         summary[key].totalRit++;
         summary[key].totalVolume += job.volume;
-        summary[key].totalPenghasilan += (job.harga * job.volume) - job.perongkosan - job.gaji - (job.bonus || 0);
+        summary[key].totalOmzet += omzet;
+        summary[key].totalPerongkosan += job.perongkosan;
+        summary[key].totalGaji += job.gaji;
+        summary[key].totalBonus += (job.bonus || 0);
+        summary[key].totalPenghasilan += omzet - job.perongkosan - job.gaji - (job.bonus || 0);
     });
     
-    let tableHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>${kategoriMap[kategori].kolom}</th>
-                    <th>Total Rit</th>
-                    <th>Total Volume</th>
-                    <th>Total Penghasilan</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    const headers = {
+        'plat': [ 'Plat Mobil', 'Total Rit', 'Total Volume', 'Total Omzet', 'Total Perongkosan', 'Total Penghasilan'],
+        'sopir': [ 'Nama Sopir', 'Total Rit', 'Total Volume', 'Total Perongkosan', 'Total Gaji', 'Total Bonus', 'Total Penghasilan'],
+        'lokasi': [ 'Nama Lokasi', 'Total Rit', 'Total Volume', 'Total Omzet', 'Total Penghasilan']
+    };
+
+    let tableHTML = `<table><thead><tr><th>${headers[kategori].join('</th><th>')}</th></tr></thead><tbody>`;
     const sortedSummary = Object.entries(summary).sort((a, b) => b[1].totalPenghasilan - a[1].totalPenghasilan);
 
     for (const [key, data] of sortedSummary) {
         const formattedKey = kategori === 'plat' ? key.toUpperCase() : formatTampilan(key);
-        tableHTML += `
-            <tr class="clickable" onclick="tampilkanStatistik('${kategori}', '${key}', 'halaman-ringkasan-stats')">
-                <td>${formattedKey}</td>
-                <td>${data.totalRit}</td>
-                <td>${data.totalVolume.toLocaleString('id-ID')}</td>
-                <td><strong>${data.totalPenghasilan.toLocaleString('id-ID')}</strong></td>
-            </tr>
-        `;
+        tableHTML += `<tr class="clickable" onclick="tampilkanStatistik('${kategori}', '${key}', 'halaman-ringkasan-stats')"><td>${formattedKey}</td>`;
+
+        if (kategori === 'plat') {
+            tableHTML += `<td>${data.totalRit}</td><td>${data.totalVolume.toLocaleString('id-ID')}</td><td>${data.totalOmzet.toLocaleString('id-ID')}</td><td>${data.totalPerongkosan.toLocaleString('id-ID')}</td><td><strong>${data.totalPenghasilan.toLocaleString('id-ID')}</strong></td>`;
+        } else if (kategori === 'sopir') {
+            tableHTML += `<td>${data.totalRit}</td><td>${data.totalVolume.toLocaleString('id-ID')}</td><td>${data.totalPerongkosan.toLocaleString('id-ID')}</td><td>${data.totalGaji.toLocaleString('id-ID')}</td><td>${data.totalBonus.toLocaleString('id-ID')}</td><td><strong>${data.totalPenghasilan.toLocaleString('id-ID')}</strong></td>`;
+        } else if (kategori === 'lokasi') {
+            tableHTML += `<td>${data.totalRit}</td><td>${data.totalVolume.toLocaleString('id-ID')}</td><td>${data.totalOmzet.toLocaleString('id-ID')}</td><td><strong>${data.totalPenghasilan.toLocaleString('id-ID')}</strong></td>`;
+        }
+        tableHTML += `</tr>`;
     }
     tableHTML += `</tbody></table>`;
     containerRingkasanStats.innerHTML = tableHTML;
@@ -631,62 +633,54 @@ function tampilkanStatistik(kategori, nilai, halamanKembali) {
     const filteredJobs = company.unloadingJobs.filter(job => (job[kategori] || '').toLowerCase() === nilai);
     filteredJobs.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
-    const totalRit = filteredJobs.length;
-    const totalVolume = filteredJobs.reduce((sum, job) => sum + job.volume, 0);
-    const totalPenghasilan = filteredJobs.reduce((sum, job) => {
-        return sum + (job.harga * job.volume) - job.perongkosan - job.gaji - (job.bonus || 0);
-    }, 0);
+    const totals = filteredJobs.reduce((acc, job) => {
+        acc.totalRit++;
+        acc.totalVolume += job.volume;
+        acc.totalOmzet += job.harga * job.volume;
+        acc.totalPerongkosan += job.perongkosan;
+        acc.totalGaji += job.gaji;
+        acc.totalBonus += (job.bonus || 0);
+        acc.totalPenghasilan += (job.harga * job.volume) - job.perongkosan - job.gaji - (job.bonus || 0);
+        return acc;
+    }, { totalRit: 0, totalVolume: 0, totalOmzet: 0, totalPerongkosan: 0, totalGaji: 0, totalBonus: 0, totalPenghasilan: 0 });
     
     const judulMap = { 'sopir': 'Sopir', 'plat': 'Kendaraan', 'lokasi': 'Lokasi' };
     const formattedNilai = kategori === 'plat' ? nilai.toUpperCase() : formatTampilan(nilai);
     statistikJudul.textContent = `Detail Statistik ${judulMap[kategori]}: ${formattedNilai}`;
 
-    statistikRingkasanContainer.innerHTML = `
-        <div class="stat-card">
-            <p class="stat-label">Total Rit</p>
-            <p class="stat-value">${totalRit}</p>
-        </div>
-        <div class="stat-card">
-            <p class="stat-label">Total Volume</p>
-            <p class="stat-value">${totalVolume.toLocaleString('id-ID')}</p>
-        </div>
-        <div class="stat-card">
-            <p class="stat-label">Total Penghasilan</p>
-            <p class="stat-value">${totalPenghasilan.toLocaleString('id-ID')}</p>
-        </div>
+    let summaryCardsHTML = `
+        <div class="stat-card"><p class="stat-label">Total Rit</p><p class="stat-value">${totals.totalRit}</p></div>
+        <div class="stat-card"><p class="stat-label">Total Volume</p><p class="stat-value">${totals.totalVolume.toLocaleString('id-ID')}</p></div>
     `;
+    if (kategori === 'plat') {
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Omzet</p><p class="stat-value">${totals.totalOmzet.toLocaleString('id-ID')}</p></div>`;
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Perongkosan</p><p class="stat-value">${totals.totalPerongkosan.toLocaleString('id-ID')}</p></div>`;
+    } else if (kategori === 'sopir') {
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Perongkosan</p><p class="stat-value">${totals.totalPerongkosan.toLocaleString('id-ID')}</p></div>`;
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Gaji</p><p class="stat-value">${totals.totalGaji.toLocaleString('id-ID')}</p></div>`;
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Bonus</p><p class="stat-value">${totals.totalBonus.toLocaleString('id-ID')}</p></div>`;
+    } else if (kategori === 'lokasi') {
+        summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Omzet</p><p class="stat-value">${totals.totalOmzet.toLocaleString('id-ID')}</p></div>`;
+    }
+    summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Penghasilan</p><p class="stat-value">${totals.totalPenghasilan.toLocaleString('id-ID')}</p></div>`;
+    statistikRingkasanContainer.innerHTML = summaryCardsHTML;
 
-    let detailHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Tanggal</th>
-                    ${kategori !== 'plat' ? '<th>Plat Mobil</th>' : ''}
-                    ${kategori !== 'sopir' ? '<th>Sopir</th>' : ''}
-                    ${kategori !== 'lokasi' ? '<th>Lokasi</th>' : ''}
-                    <th>Material</th>
-                    <th>Volume</th>
-                    <th>Penghasilan</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    // Tabel Detail Riwayat
+    const headers = {'plat': ['Tanggal', 'Sopir', 'Lokasi', 'Material', 'Volume', 'Harga', 'Omzet', 'Perongkosan', 'Penghasilan'], 'sopir': ['Tanggal', 'Plat Mobil', 'Lokasi', 'Material', 'Volume', 'Perongkosan', 'Gaji', 'Bonus', 'Penghasilan'], 'lokasi': ['Tanggal', 'Plat Mobil', 'Sopir', 'Material', 'Volume', 'Omzet', 'Penghasilan']};
+    let detailHTML = `<table><thead><tr><th>${headers[kategori].join('</th><th>')}</th></tr></thead><tbody>`;
     filteredJobs.forEach(job => {
-        const income = (job.harga * job.volume) - job.perongkosan - job.gaji - (job.bonus || 0);
-        const displayDate = new Date(job.tanggal).toLocaleDateString('id-ID', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        });
-        detailHTML += `
-            <tr>
-                <td>${displayDate}</td>
-                ${kategori !== 'plat' ? `<td class="col-plat">${job.plat.toUpperCase()}</td>` : ''}
-                ${kategori !== 'sopir' ? `<td class="col-sopir">${formatTampilan(job.sopir)}</td>` : ''}
-                ${kategori !== 'lokasi' ? `<td class="col-lokasi">${formatTampilan(job.lokasi)}</td>` : ''}
-                <td class="col-material">${formatTampilan(job.material)}</td>
-                <td class="col-volume">${job.volume.toLocaleString('id-ID')}</td>
-                <td class="col-penghasilan"><strong>${income.toLocaleString('id-ID')}</strong></td>
-            </tr>
-        `;
+        const omzet = job.harga * job.volume;
+        const income = omzet - job.perongkosan - job.gaji - (job.bonus || 0);
+        const displayDate = new Date(job.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
+        detailHTML += `<tr><td>${displayDate}</td>`;
+        if (kategori === 'plat') {
+            detailHTML += `<td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.harga.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+        } else if (kategori === 'sopir') {
+            detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td>${job.gaji.toLocaleString('id-ID')}</td><td>${(job.bonus || 0).toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+        } else if (kategori === 'lokasi') {
+            detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+        }
+        detailHTML += `</tr>`;
     });
     detailHTML += `</tbody></table>`;
     statistikTabelDetail.innerHTML = detailHTML;
