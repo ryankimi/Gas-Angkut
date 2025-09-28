@@ -15,6 +15,9 @@ let activeCompanyId = null;
 let sortColumn = 'tanggal';
 let sortDirection = 'desc';
 let currentRingkasanKategori = '';
+let currentDetailKategori = '';
+let currentDetailNilai = '';
+let currentDetailHalamanKembali = '';
 
 // Halaman
 const semuaHalaman = document.querySelectorAll('.page');
@@ -55,6 +58,7 @@ const kembaliDariStatistik = document.getElementById('kembali-dari-statistik');
 const statistikJudul = document.getElementById('statistik-judul');
 const statistikRingkasanContainer = document.getElementById('statistik-ringkasan-container');
 const statistikTabelDetail = document.getElementById('statistik-tabel-detail');
+const filterBulanDetail = document.getElementById('filter-bulan-detail');
 
 // Elemen Modal
 const modalBongkaran = document.getElementById('modal-bongkaran');
@@ -629,8 +633,21 @@ function tampilkanRingkasanStats(kategori) {
 
 
 function tampilkanStatistik(kategori, nilai, halamanKembali) {
+    // Simpan state untuk refresh filter
+    currentDetailKategori = kategori;
+    currentDetailNilai = nilai;
+    currentDetailHalamanKembali = halamanKembali;
+    
     const company = getActiveCompany();
-    const filteredJobs = company.unloadingJobs.filter(job => (job[kategori] || '').toLowerCase() === nilai);
+    const allJobsForItem = company.unloadingJobs.filter(job => (job[kategori] || '').toLowerCase() === nilai);
+
+    populateMonthFilter(filterBulanDetail, allJobsForItem, () => tampilkanStatistik(kategori, nilai, halamanKembali));
+
+    const selectedMonth = filterBulanDetail.value;
+    const filteredJobs = selectedMonth === 'semua'
+        ? allJobsForItem
+        : allJobsForItem.filter(job => job.tanggal.startsWith(selectedMonth));
+    
     filteredJobs.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
     const totals = filteredJobs.reduce((acc, job) => {
@@ -665,23 +682,27 @@ function tampilkanStatistik(kategori, nilai, halamanKembali) {
     summaryCardsHTML += `<div class="stat-card"><p class="stat-label">Total Penghasilan</p><p class="stat-value">${totals.totalPenghasilan.toLocaleString('id-ID')}</p></div>`;
     statistikRingkasanContainer.innerHTML = summaryCardsHTML;
 
-    // Tabel Detail Riwayat
     const headers = {'plat': ['Tanggal', 'Sopir', 'Lokasi', 'Material', 'Volume', 'Harga', 'Omzet', 'Perongkosan', 'Penghasilan'], 'sopir': ['Tanggal', 'Plat Mobil', 'Lokasi', 'Material', 'Volume', 'Perongkosan', 'Gaji', 'Bonus', 'Penghasilan'], 'lokasi': ['Tanggal', 'Plat Mobil', 'Sopir', 'Material', 'Volume', 'Omzet', 'Penghasilan']};
     let detailHTML = `<table><thead><tr><th>${headers[kategori].join('</th><th>')}</th></tr></thead><tbody>`;
-    filteredJobs.forEach(job => {
-        const omzet = job.harga * job.volume;
-        const income = omzet - job.perongkosan - job.gaji - (job.bonus || 0);
-        const displayDate = new Date(job.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
-        detailHTML += `<tr><td>${displayDate}</td>`;
-        if (kategori === 'plat') {
-            detailHTML += `<td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.harga.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
-        } else if (kategori === 'sopir') {
-            detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td>${job.gaji.toLocaleString('id-ID')}</td><td>${(job.bonus || 0).toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
-        } else if (kategori === 'lokasi') {
-            detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
-        }
-        detailHTML += `</tr>`;
-    });
+    if (filteredJobs.length === 0) {
+        const colspan = headers[kategori].length;
+        detailHTML += `<tr><td colspan="${colspan}">Tidak ada data untuk bulan yang dipilih.</td></tr>`;
+    } else {
+        filteredJobs.forEach(job => {
+            const omzet = job.harga * job.volume;
+            const income = omzet - job.perongkosan - job.gaji - (job.bonus || 0);
+            const displayDate = new Date(job.tanggal).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
+            detailHTML += `<tr><td>${displayDate}</td>`;
+            if (kategori === 'plat') {
+                detailHTML += `<td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.harga.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+            } else if (kategori === 'sopir') {
+                detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.lokasi)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${job.perongkosan.toLocaleString('id-ID')}</td><td>${job.gaji.toLocaleString('id-ID')}</td><td>${(job.bonus || 0).toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+            } else if (kategori === 'lokasi') {
+                detailHTML += `<td>${job.plat.toUpperCase()}</td><td>${formatTampilan(job.sopir)}</td><td>${formatTampilan(job.material)}</td><td>${job.volume.toLocaleString('id-ID')}</td><td>${omzet.toLocaleString('id-ID')}</td><td><strong>${income.toLocaleString('id-ID')}</strong></td>`;
+            }
+            detailHTML += `</tr>`;
+        });
+    }
     detailHTML += `</tbody></table>`;
     statistikTabelDetail.innerHTML = detailHTML;
 
